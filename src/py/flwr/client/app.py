@@ -17,7 +17,7 @@
 import sys
 import time
 from logging import DEBUG, ERROR, INFO, WARN
-from typing import Callable, ContextManager, Optional, Tuple, Type, Union
+from typing import Callable, ContextManager, List, Optional, Tuple, Type, Union
 
 from cryptography.hazmat.primitives.asymmetric import ec
 from grpc import RpcError
@@ -79,6 +79,7 @@ def start_client(
     ] = None,
     max_retries: Optional[int] = None,
     max_wait_time: Optional[float] = None,
+    metadata: List[Tuple[str,str]] = []
 ) -> None:
     """Start a Flower client node which connects to a Flower server.
 
@@ -120,7 +121,10 @@ def start_client(
         The maximum duration before the client stops trying to
         connect to the server in case of connection error.
         If set to None, there is no limit to the total time.
-
+        metadata: List[Tuple[str,str]] (default: [])
+            A List of metadata that should be send together with gRPC calls.
+            Entries should be a (key,value) Tuple.
+            The entries will be sent as http-headers to the gRPC endpoint.
     Examples
     --------
     Starting a gRPC client with an insecure server connection:
@@ -150,6 +154,18 @@ def start_client(
     >>>     client_fn=client_fn,
     >>>     root_certificates=Path("/crts/root.pem").read_bytes(),
     >>> )
+
+    Starting a trusted SSL-enabled client with authorization metadata:
+
+    >>> from pathlib import Path
+    >>> start_client(
+    >>>     server_address=localhost:8080,
+    >>>     client=FlowerClient(),
+    >>>     root_certificates=Path("/etc/ssl/certs/ca-certificates.crt").read_bytes(),
+    >>>     metadata=[("authorization":"Bearer ey...")]
+    >>> )
+        
+
     """
     event(EventType.START_CLIENT_ENTER)
     _start_client_internal(
@@ -310,6 +326,7 @@ def _start_client_internal(
             grpc_max_message_length,
             root_certificates,
             authentication_keys,
+            metadata=metadata
         ) as conn:
             # pylint: disable-next=W0612
             receive, send, create_node, delete_node, get_run = conn
@@ -428,6 +445,8 @@ def start_numpy_client(
     root_certificates: Optional[bytes] = None,
     insecure: Optional[bool] = None,
     transport: Optional[str] = None,
+    metadata: List[Tuple[str,str]] = []
+
 ) -> None:
     """Start a Flower NumPyClient which connects to a gRPC server.
 
@@ -464,6 +483,10 @@ def start_numpy_client(
         - 'grpc-bidi': gRPC, bidirectional streaming
         - 'grpc-rere': gRPC, request-response (experimental)
         - 'rest': HTTP (experimental)
+    metadata: List[Tuple[str,str]] (default: [])
+        A List of metadata that should be send together with gRPC calls.
+        Entries should be a (key,value) Tuple.
+        The entries will be sent as http-headers to the gRPC endpoint.
 
     Examples
     --------
@@ -491,6 +514,17 @@ def start_numpy_client(
     >>>     client=FlowerClient(),
     >>>     root_certificates=Path("/crts/root.pem").read_bytes(),
     >>> )
+
+    Starting a trusted SSL-enabled client with authorization:
+
+    >>> from pathlib import Path
+    >>> start_client(
+    >>>     server_address=localhost:8080,
+    >>>     client=FlowerClient(),
+    >>>     root_certificates=Path("/etc/ssl/certs/ca-certificates.crt").read_bytes(),
+    >>>     metadata=[("authorization":"Bearer ey...")],
+    >>> )
+    
     """
     mssg = (
         "flwr.client.start_numpy_client() is deprecated. \n\tInstead, use "
@@ -518,6 +552,7 @@ def start_numpy_client(
         root_certificates=root_certificates,
         insecure=insecure,
         transport=transport,
+        metadata=metadata
     )
 
 
