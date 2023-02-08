@@ -62,6 +62,7 @@ def start_grpc_server(  # pylint: disable=too-many-arguments
     max_message_length: int = GRPC_MAX_MESSAGE_LENGTH,
     keepalive_time_ms: int = 210000,
     certificates: Optional[Tuple[bytes, bytes, bytes]] = None,
+    interceptors: Optional[Any] = None,
 ) -> grpc.Server:
     """Create and start a gRPC server running FlowerServiceServicer.
 
@@ -113,6 +114,11 @@ def start_grpc_server(  # pylint: disable=too-many-arguments
             * CA certificate.
             * server certificate.
             * server private key.
+    interceptors: Any (default: None)
+        An optional list of ServerInterceptor objects that observe
+        and optionally manipulate the incoming RPCs before handing them over to
+        handlers. The interceptors are given control in the order they are
+        specified.
 
     Returns
     -------
@@ -144,6 +150,7 @@ def start_grpc_server(  # pylint: disable=too-many-arguments
         max_message_length=max_message_length,
         keepalive_time_ms=keepalive_time_ms,
         certificates=certificates,
+        interceptors=interceptors,
     )
 
     server.start()
@@ -208,6 +215,11 @@ def generic_create_grpc_server(  # pylint: disable=too-many-arguments
             * CA certificate.
             * server certificate.
             * server private key.
+    interceptors: Any (default: None)
+        An optional list of ServerInterceptor objects that observe
+        and optionally manipulate the incoming RPCs before handing them over to
+        handlers. The interceptors are given control in the order they are
+        specified.
 
     Returns
     -------

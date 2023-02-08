@@ -23,7 +23,7 @@ import threading
 from logging import ERROR, INFO, WARN
 from os.path import isfile
 from pathlib import Path
-from typing import List, Optional, Sequence, Set, Tuple
+from typing import Any, List, Optional, Sequence, Set, Tuple
 
 import grpc
 from cryptography.hazmat.primitives.asymmetric import ec
@@ -83,6 +83,7 @@ def start_server(  # pylint: disable=too-many-arguments,too-many-locals
     client_manager: Optional[ClientManager] = None,
     grpc_max_message_length: int = GRPC_MAX_MESSAGE_LENGTH,
     certificates: Optional[Tuple[bytes, bytes, bytes]] = None,
+    interceptors: Optional[Any] = None,
 ) -> History:
     """Start a Flower server using the gRPC transport layer.
 
@@ -121,6 +122,11 @@ def start_server(  # pylint: disable=too-many-arguments,too-many-locals
             * CA certificate.
             * server certificate.
             * server private key.
+    interceptors: Any (default: None)
+        An optional list of ServerInterceptor objects that observe
+        and optionally manipulate the incoming RPCs before handing them over to
+        handlers. The interceptors are given control in the order they are
+        specified.
 
     Returns
     -------
@@ -171,6 +177,7 @@ def start_server(  # pylint: disable=too-many-arguments,too-many-locals
         server_address=address,
         max_message_length=grpc_max_message_length,
         certificates=certificates,
+        interceptors=interceptors,
     )
     log(
         INFO,

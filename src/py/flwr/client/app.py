@@ -79,7 +79,7 @@ def start_client(
     ] = None,
     max_retries: Optional[int] = None,
     max_wait_time: Optional[float] = None,
-    metadata: List[Tuple[str,str]] = []
+    metadata: List[Tuple[str, str]] = [],
 ) -> None:
     """Start a Flower client node which connects to a Flower server.
 
@@ -164,7 +164,7 @@ def start_client(
     >>>     root_certificates=Path("/etc/ssl/certs/ca-certificates.crt").read_bytes(),
     >>>     metadata=[("authorization":"Bearer ey...")]
     >>> )
-        
+
 
     """
     event(EventType.START_CLIENT_ENTER)
@@ -180,6 +180,7 @@ def start_client(
         authentication_keys=authentication_keys,
         max_retries=max_retries,
         max_wait_time=max_wait_time,
+        metadata=metadata,
     )
     event(EventType.START_CLIENT_LEAVE)
 
@@ -203,6 +204,7 @@ def _start_client_internal(
     ] = None,
     max_retries: Optional[int] = None,
     max_wait_time: Optional[float] = None,
+    metadata,
 ) -> None:
     """Start a Flower client node which connects to a Flower server.
 
@@ -326,7 +328,7 @@ def _start_client_internal(
             grpc_max_message_length,
             root_certificates,
             authentication_keys,
-            metadata=metadata
+            metadata=metadata,
         ) as conn:
             # pylint: disable-next=W0612
             receive, send, create_node, delete_node, get_run = conn
@@ -445,8 +447,7 @@ def start_numpy_client(
     root_certificates: Optional[bytes] = None,
     insecure: Optional[bool] = None,
     transport: Optional[str] = None,
-    metadata: List[Tuple[str,str]] = []
-
+    metadata: List[Tuple[str, str]] = [],
 ) -> None:
     """Start a Flower NumPyClient which connects to a gRPC server.
 
@@ -524,7 +525,7 @@ def start_numpy_client(
     >>>     root_certificates=Path("/etc/ssl/certs/ca-certificates.crt").read_bytes(),
     >>>     metadata=[("authorization":"Bearer ey...")],
     >>> )
-    
+
     """
     mssg = (
         "flwr.client.start_numpy_client() is deprecated. \n\tInstead, use "
@@ -552,7 +553,7 @@ def start_numpy_client(
         root_certificates=root_certificates,
         insecure=insecure,
         transport=transport,
-        metadata=metadata
+        metadata=metadata,
     )
 
 
